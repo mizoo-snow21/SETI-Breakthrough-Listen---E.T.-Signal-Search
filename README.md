@@ -1,6 +1,6 @@
 # SETI-Breakthrough-Listen---E.T.-Signal-Search
 
-https://www.kaggle.com/c/seti-breakthrough-listen/leaderboard
+https://www.kaggle.com/c/seti-breakthrough-listen/leaderboard  
 We got 92th prize.  
 This is summary and codes.
 

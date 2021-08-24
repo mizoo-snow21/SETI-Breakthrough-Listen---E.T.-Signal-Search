@@ -6,63 +6,79 @@ This is summary and codes.
 
 # Summary
 
-
 ## Data strategy
 ・5fold StratifiedKFold  
-・Using 2020 data  
-・Cretate predicted train data labels as output file  
-
+・Using new data  
 
 # Model
-## vit_base_patch16_384
-・img_size = 384 x 384  
-・4x TTA  
-
-## efficientnet_b4_ns
+## efficientnet_b0_ns
 ・img_size = 512 x 512  
-・4x TTA  
+・optimizer = sam  
+・epoch = 20  
+・scheduler = GradualWarmupScheduler + CosineAnnealingLR  
 
-## resnest50d_4s2x40d
+## efficientnet_b3_ns
 ・img_size = 512 x 512  
-・4x TTA  
+・optimizer = AdamP  
+・epoch = 17    
+・scheduler = GradualWarmupScheduler + CosineAnnealingLR  
 
-## Weighted_Averaging
-・Pulic Score 0.9063  
-・Private Score 0.9010  
+## eca-nfnetl0  
+・img_size = 512 x 512  
+・optimizer = Ranger  
+・epoch = 15    
+・scheduler = ReduceLROnPlateau  
+
+## efficientnet_v2_s    
+・img_size = 512 x 512  
+・optimizer = AdamP  
+・epoch = 15    
+・scheduler = GradualWarmupScheduler + CosineAnnealingLR 
+
+## Weighte optimazation  
+ cv = 0.8824  
+ lb = 0.77510  
 
 # Some Settings
 ## Augmentaion
 ```
-def get_train_transforms():
-    return Compose([
-            RandomResizedCrop(CFG['img_size'], CFG['img_size']),
-            Transpose(p=0.5),
-            HorizontalFlip(p=0.5),
-            VerticalFlip(p=0.5),
-            ShiftScaleRotate(p=0.5),
-            HueSaturationValue(hue_shift_limit=0.2, sat_shift_limit=0.2, val_shift_limit=0.2, p=0.5),
-            RandomBrightnessContrast(brightness_limit=(-0.1,0.1), contrast_limit=(-0.1, 0.1), p=0.5),
-            Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0, p=1.0),
-            CoarseDropout(p=0.5),
-            Cutout(p=0.5),
-            ToTensorV2(p=1.0),
-        ], p=1.)
+def get_transforms(*, data):
+    
+    if data == 'train':
+        return A.Compose([
+            A.Resize(CFG.size, CFG.size, p=1.0),
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.ShiftScaleRotate(rotate_limit=0, p=0.25),
+            A.OneOf([
+                A.MotionBlur(p=1.0),
+                A.GaussianBlur(p=1.0),
+                A.GaussNoise(p=1.0),
+            ], p=0.2),
+            A.OneOf([
+                A.OpticalDistortion(distort_limit=1.0, p=1.0),
+                A.GridDistortion(num_steps=5, distort_limit=1.0, p=1.0),
+                A.ElasticTransform(alpha=3, p=1.0),
+            ], p=0.2),
+            A.IAASharpen(p=0.25),
+            A.Cutout(p=0.3),
+            ToTensorV2(),
+        ])
 
-def get_valid_transforms():
-    return Compose([
-            CenterCrop(CFG['img_size'], CFG['img_size'], p=1.),
-            Resize(CFG['img_size'], CFG['img_size']),
-            Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0, p=1.0),
-            ToTensorV2(p=1.0),
-        ], p=1.)
+    elif data == 'valid':
+        return A.Compose([
+            A.Resize(CFG.size, CFG.size),
+            ToTensorV2(),
+        ])
 ```
-## Loss
-TaylorCrossEntropyLoss
+・mixup(alpha=0.5)  
 
-## LR Scheduler
-CosineAnnealingWarmRestarts
+## Loss
+BCEWithlogitsloss(pos_weight=1.5)  
+
 
 # Not Worked
-・Loss function(BiTemperedLogisticLoss/FocalCosineLoss/CrossEntropyLoss)  
-・LRscheduler(GradualWarmupScheduler/OneCycleLR/LambdaLR)  
-・Additional data(2019)  
+・Loss function(FocalCosineLoss/CrossEntropyLoss)  
+・LRscheduler(OneCycleLR/LambdaLR)  
+・Additional data(old)  
+・cutmix  

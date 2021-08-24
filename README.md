@@ -5,9 +5,9 @@ We got 92th prize.
 This is summary and codes.
 
 # Summary
-![image](https://user-images.githubusercontent.com/55850618/124774601-e7070a80-df78-11eb-8571-72bd3a390282.png)
 
-## 1st Stage
+
+## Data strategy
 ・5fold StratifiedKFold  
 ・Using 2020 data  
 ・Cretate predicted train data labels as output file  

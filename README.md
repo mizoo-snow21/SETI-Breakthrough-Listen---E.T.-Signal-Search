@@ -35,7 +35,8 @@ This is summary and codes.
 ・epoch = 15    
 ・scheduler = GradualWarmupScheduler + CosineAnnealingLR 
 
-## Weighte optimazation  
+## Weight optimazation 
+I use weight optimazation to maximize cv.  
  cv = 0.8824  
  lb = 0.77510  
 

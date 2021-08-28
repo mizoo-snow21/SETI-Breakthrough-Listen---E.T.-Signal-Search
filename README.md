@@ -8,7 +8,7 @@ This is summary and codes.
 
 ## Data strategy
 ・5fold StratifiedKFold  
-・Using new data  
+・Using new data(3ch)  
 
 # Model
 ## efficientnet_b0_ns
